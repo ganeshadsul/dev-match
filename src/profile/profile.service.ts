@@ -80,4 +80,18 @@ export class ProfileService {
       .collection('profiles')
       .findOne({ _id: new ObjectId(id) });
   }
+
+  async delete(id: string) {
+    if (!ObjectId.isValid(id))
+      throw new BadRequestException('Invalid profile id');
+    const res = await this.db
+      .collection('profiles')
+      .deleteOne({ _id: new ObjectId(id) });
+    if (res.deletedCount === 0) {
+      throw new NotFoundException('Profile not found.');
+    }
+    return await this.db
+      .collection('profiles')
+      .findOne({ _id: new ObjectId(id) });
+  }
 }

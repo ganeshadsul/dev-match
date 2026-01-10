@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -76,5 +77,17 @@ export class ProfileController {
     );
     const data = await this.profileServive.patch(id, patchProfileDTO);
     return { ...res, data };
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    const res = this.profileServive.commonResponse(
+      'Profile deleted successfully.',
+    );
+    const data = await this.profileServive.delete(id);
+    return {
+      ...res,
+      data: { profile: data },
+    };
   }
 }

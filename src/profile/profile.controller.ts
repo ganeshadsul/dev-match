@@ -15,6 +15,8 @@ import { CreateProfileDTO } from './dto/create.profile.dto';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
 import { PatchProfileDTO } from './dto/patch.profile.dto';
 import { handleProfileError } from 'src/common/errors/handlers/profile.errors.handler';
+import { ObjectIdPipe } from 'src/common/pipes/object-id.pipe';
+import { ObjectId } from 'mongodb';
 
 @Controller('profile')
 export class ProfileController {
@@ -38,7 +40,7 @@ export class ProfileController {
 
   // route: /profile/:id GET
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ObjectIdPipe) id: ObjectId) {
     try {
       const profile = await this.profileServive.findOne(id);
       const res = this.profileServive.commonResponse('Profile Found.');
@@ -62,7 +64,7 @@ export class ProfileController {
   // route /profile/:id PUT
   @Put(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ObjectIdPipe) id: ObjectId,
     @Body() updateProfileDTO: UpdateProfileDTO,
   ) {
     try {
@@ -79,7 +81,7 @@ export class ProfileController {
   // route /profile/:id PATCH
   @Patch(':id')
   async patch(
-    @Param('id') id: string,
+    @Param('id', ObjectIdPipe) id: ObjectId,
     @Body() patchProfileDTO: PatchProfileDTO,
   ) {
     try {
@@ -95,7 +97,7 @@ export class ProfileController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ObjectIdPipe) id: ObjectId) {
     try {
       await this.profileServive.delete(id);
     } catch (error: unknown) {

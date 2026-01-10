@@ -31,7 +31,7 @@ export class ProfileService {
   }
 
   // find one profile by id
-  async findOne(id: string) {
+  async findOne(id: ObjectId) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new AppError(
@@ -54,7 +54,7 @@ export class ProfileService {
   }
 
   // update whole profile object
-  async update(id: string, data: UpdateProfileDTO) {
+  async update(id: ObjectId, data: UpdateProfileDTO) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new AppError(
@@ -77,7 +77,7 @@ export class ProfileService {
   }
 
   // update a part of the profile object
-  async patch(id: string, data: PatchProfileDTO) {
+  async patch(id: ObjectId, data: PatchProfileDTO) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new AppError(
@@ -110,7 +110,7 @@ export class ProfileService {
   }
 
   // delete profile
-  async delete(id: string) {
+  async delete(id: ObjectId) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new AppError(

@@ -1,18 +1,14 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';

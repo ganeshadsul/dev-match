@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -15,6 +18,9 @@ import { ProfileService } from './profile.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
 import { PatchProfileDTO } from './dto/patch.profile.dto';
+import { AppError } from 'src/common/errors/app-error';
+import { ErrorTypes } from 'src/common/enums/error.types';
+import { handleProfileError } from 'src/common/errors/handlers/profile.errors.handler';
 
 @Controller('profile')
 export class ProfileController {
@@ -39,9 +45,13 @@ export class ProfileController {
   // route: /profile/:id GET
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const profile = await this.profileServive.findOne(id);
-    const res = this.profileServive.commonResponse('Profile Found.');
-    return { ...res, data: profile };
+    try {
+      const profile = await this.profileServive.findOne(id);
+      const res = this.profileServive.commonResponse('Profile Found.');
+      return { ...res, data: profile };
+    } catch (error: unknown) {
+      handleProfileError(error);
+    }
   }
 
   // route /profile POST
@@ -61,11 +71,15 @@ export class ProfileController {
     @Param('id') id: string,
     @Body() updateProfileDTO: UpdateProfileDTO,
   ) {
-    const res = this.profileServive.commonResponse(
-      'Profile updated successfully.',
-    );
-    const profile = await this.profileServive.update(id, updateProfileDTO);
-    return { ...res, data: { profile } };
+    try {
+      const res = this.profileServive.commonResponse(
+        'Profile updated successfully.',
+      );
+      const profile = await this.profileServive.update(id, updateProfileDTO);
+      return { ...res, data: { profile } };
+    } catch (error) {
+      handleProfileError(error);
+    }
   }
 
   // route /profile/:id PATCH
@@ -74,16 +88,24 @@ export class ProfileController {
     @Param('id') id: string,
     @Body() patchProfileDTO: PatchProfileDTO,
   ) {
-    const res = this.profileServive.commonResponse(
-      'Profile patched successfully.',
-    );
-    const data = await this.profileServive.patch(id, patchProfileDTO);
-    return { ...res, data };
+    try {
+      const res = this.profileServive.commonResponse(
+        'Profile patched successfully.',
+      );
+      const data = await this.profileServive.patch(id, patchProfileDTO);
+      return { ...res, data };
+    } catch (error) {
+      handleProfileError(error);
+    }
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string) {
-    await this.profileServive.delete(id);
+    try {
+      await this.profileServive.delete(id);
+    } catch (error: unknown) {
+      handleProfileError(error);
+    }
   }
 }

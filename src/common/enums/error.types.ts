@@ -1,0 +1,5 @@
+export enum ErrorTypes {
+  INVALID_ID = 'INVALID_ID',
+  NOT_FOUND = 'NOT_FOUND',
+  INVALID_REQUEST_DATA = 'INVALID_REQUEST_DATA ',
+}

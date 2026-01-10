@@ -1,14 +1,12 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Collection, Db } from 'mongodb';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { ObjectId } from 'mongodb';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
 import { PatchProfileDTO } from './dto/patch.profile.dto';
+import { AppError } from 'src/common/errors/app-error';
+import { ErrorTypes } from 'src/common/enums/error.types';
+import { ErrorMessages } from 'src/common/enums/error.message';
 
 @Injectable()
 export class ProfileService {
@@ -34,6 +32,13 @@ export class ProfileService {
 
   // find one profile by id
   async findOne(id: string) {
+    // checking if id is valid
+    if (!ObjectId.isValid(id))
+      throw new AppError(
+        ErrorTypes.INVALID_ID,
+        ErrorMessages.INVALID_PROFILE_ID,
+      );
+
     return await this.profileCollection.findOne({ _id: new ObjectId(id) });
   }
 
@@ -52,7 +57,10 @@ export class ProfileService {
   async update(id: string, data: UpdateProfileDTO) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
-      throw new BadRequestException('Invalid proile id');
+      throw new AppError(
+        ErrorTypes.INVALID_ID,
+        ErrorMessages.INVALID_PROFILE_ID,
+      );
 
     // updating profile
     const res = await this.profileCollection.updateOne(
@@ -61,9 +69,8 @@ export class ProfileService {
     );
 
     // checking if profile corrospoing to profile was updated or not
-    if (res.matchedCount === 0) {
-      throw new NotFoundException('Profile not found.');
-    }
+    if (res.matchedCount === 0)
+      throw new AppError(ErrorTypes.NOT_FOUND, ErrorMessages.PROFILE_NOT_FOUND);
 
     // returning updated profile
     return await this.profileCollection.findOne({ _id: new ObjectId(id) });
@@ -73,14 +80,17 @@ export class ProfileService {
   async patch(id: string, data: PatchProfileDTO) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
-      throw new BadRequestException('Invalid proile id');
+      throw new AppError(
+        ErrorTypes.INVALID_ID,
+        ErrorMessages.INVALID_PROFILE_ID,
+      );
 
     // validating whether there is atlest one parmeter to patch
-    if (!data.name && !data.description) {
-      throw new BadRequestException(
-        'Request data incorrect: provide name or description',
+    if (!data.name && !data.description)
+      throw new AppError(
+        ErrorTypes.INVALID_REQUEST_DATA,
+        ErrorMessages.PROVIDE_NAME_AND_DESCRIPTION,
       );
-    }
 
     // updating profile object
     const res = await this.profileCollection.updateOne(
@@ -89,9 +99,11 @@ export class ProfileService {
     );
 
     // checking if profile corrospoing to profile was updated or not
-    if (res.matchedCount === 0) {
-      throw new NotFoundException('Profile not found.');
-    }
+    if (res.matchedCount === 0)
+      throw new AppError(
+        ErrorTypes.NOT_FOUND,
+        ErrorMessages.INVALID_PROFILE_ID,
+      );
 
     // returning updated profile
     return await this.profileCollection.findOne({ _id: new ObjectId(id) });
@@ -101,7 +113,10 @@ export class ProfileService {
   async delete(id: string) {
     // checking if id is valid
     if (!ObjectId.isValid(id))
-      throw new BadRequestException('Invalid profile id');
+      throw new AppError(
+        ErrorTypes.INVALID_ID,
+        ErrorMessages.INVALID_PROFILE_ID,
+      );
 
     // deleting profile
     const res = await this.profileCollection.deleteOne({
@@ -110,7 +125,7 @@ export class ProfileService {
 
     // checking if profile corrospoing to profile was updated or not
     if (res.deletedCount === 0) {
-      throw new NotFoundException('Profile not found.');
+      throw new AppError(ErrorTypes.NOT_FOUND, ErrorMessages.PROFILE_NOT_FOUND);
     }
     return null;
   }

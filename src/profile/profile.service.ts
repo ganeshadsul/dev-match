@@ -32,13 +32,6 @@ export class ProfileService {
 
   // find one profile by id
   async findOne(id: ObjectId) {
-    // checking if id is valid
-    if (!ObjectId.isValid(id))
-      throw new AppError(
-        ErrorTypes.INVALID_ID,
-        ErrorMessages.INVALID_PROFILE_ID,
-      );
-
     return await this.profileCollection.findOne({ _id: new ObjectId(id) });
   }
 
@@ -55,13 +48,6 @@ export class ProfileService {
 
   // update whole profile object
   async update(id: ObjectId, data: UpdateProfileDTO) {
-    // checking if id is valid
-    if (!ObjectId.isValid(id))
-      throw new AppError(
-        ErrorTypes.INVALID_ID,
-        ErrorMessages.INVALID_PROFILE_ID,
-      );
-
     // updating profile
     const res = await this.profileCollection.updateOne(
       { _id: new ObjectId(id) },
@@ -78,13 +64,6 @@ export class ProfileService {
 
   // update a part of the profile object
   async patch(id: ObjectId, data: PatchProfileDTO) {
-    // checking if id is valid
-    if (!ObjectId.isValid(id))
-      throw new AppError(
-        ErrorTypes.INVALID_ID,
-        ErrorMessages.INVALID_PROFILE_ID,
-      );
-
     // validating whether there is atlest one parmeter to patch
     if (!data.name && !data.description)
       throw new AppError(
@@ -111,13 +90,6 @@ export class ProfileService {
 
   // delete profile
   async delete(id: ObjectId) {
-    // checking if id is valid
-    if (!ObjectId.isValid(id))
-      throw new AppError(
-        ErrorTypes.INVALID_ID,
-        ErrorMessages.INVALID_PROFILE_ID,
-      );
-
     // deleting profile
     const res = await this.profileCollection.deleteOne({
       _id: new ObjectId(id),

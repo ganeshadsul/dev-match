@@ -24,74 +24,95 @@ export class ProfileService {
     };
   }
 
+  // get all profiles
   async findAll() {
     return await this.db.collection('profiles').find().toArray();
   }
 
+  // find one profile by id
   async findOne(id: string) {
     return await this.db
       .collection('profiles')
       .findOne({ _id: new ObjectId(id) });
   }
 
+  // create new profile
   async create(data: CreateProfileDTO) {
     const res = await this.db.collection('profiles').insertOne(data);
+    // retreiving created profile data
     const profile = await this.db
       .collection('profiles')
       .findOne({ _id: res.insertedId });
+
     return profile;
   }
 
+  // update whole profile object
   async update(id: string, data: UpdateProfileDTO) {
-    console.log('is valid', ObjectId.isValid(id));
+    // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new BadRequestException('Invalid proile id');
 
+    // updating profile
     const res = await this.db
       .collection('profiles')
       .updateOne({ _id: new ObjectId(id) }, { $set: data });
 
+    // checking if profile corrospoing to profile was updated or not
     if (res.matchedCount === 0) {
       throw new NotFoundException('Profile not found.');
     }
+
+    // returning updated profile
     return await this.db
       .collection('profiles')
       .findOne({ _id: new ObjectId(id) });
   }
 
+  // update a part of the profile object
   async patch(id: string, data: PatchProfileDTO) {
+    // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new BadRequestException('Invalid proile id');
 
+    // validating whether there is atlest one parmeter to patch
     if (!data.name && !data.description) {
       throw new BadRequestException(
         'Request data incorrect: provide name or description',
       );
     }
+
+    // updating profile object
     const res = await this.db
       .collection('profiles')
       .updateOne({ _id: new ObjectId(id) }, { $set: { ...data } });
 
+    // checking if profile corrospoing to profile was updated or not
     if (res.matchedCount === 0) {
       throw new NotFoundException('Profile not found.');
     }
 
+    // returning updated profile
     return await this.db
       .collection('profiles')
       .findOne({ _id: new ObjectId(id) });
   }
 
+  // delete profile
   async delete(id: string) {
+    // checking if id is valid
     if (!ObjectId.isValid(id))
       throw new BadRequestException('Invalid profile id');
+
+    // deleting profile
     const res = await this.db
       .collection('profiles')
       .deleteOne({ _id: new ObjectId(id) });
+
+    // checking if profile corrospoing to profile was updated or not
     if (res.deletedCount === 0) {
       throw new NotFoundException('Profile not found.');
     }
-    return await this.db
-      .collection('profiles')
-      .findOne({ _id: new ObjectId(id) });
+    return null;
   }
 }

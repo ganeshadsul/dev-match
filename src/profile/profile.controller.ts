@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -80,14 +82,8 @@ export class ProfileController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(@Param('id') id: string) {
-    const res = this.profileServive.commonResponse(
-      'Profile deleted successfully.',
-    );
-    const data = await this.profileServive.delete(id);
-    return {
-      ...res,
-      data: { profile: data },
-    };
+    await this.profileServive.delete(id);
   }
 }

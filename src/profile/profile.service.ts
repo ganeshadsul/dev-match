@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Db } from 'mongodb';
+import { Collection, Db } from 'mongodb';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { ObjectId } from 'mongodb';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
@@ -12,10 +12,13 @@ import { PatchProfileDTO } from './dto/patch.profile.dto';
 
 @Injectable()
 export class ProfileService {
+  private readonly profileCollection: Collection;
   constructor(
     @Inject('MONGO_DB')
     private readonly db: Db,
-  ) {}
+  ) {
+    this.profileCollection = this.db.collection('profiles');
+  }
 
   commonResponse(message: string) {
     return {
@@ -26,23 +29,21 @@ export class ProfileService {
 
   // get all profiles
   async findAll() {
-    return await this.db.collection('profiles').find().toArray();
+    return await this.profileCollection.find().toArray();
   }
 
   // find one profile by id
   async findOne(id: string) {
-    return await this.db
-      .collection('profiles')
-      .findOne({ _id: new ObjectId(id) });
+    return await this.profileCollection.findOne({ _id: new ObjectId(id) });
   }
 
   // create new profile
   async create(data: CreateProfileDTO) {
-    const res = await this.db.collection('profiles').insertOne(data);
+    const res = await this.profileCollection.insertOne(data);
     // retreiving created profile data
-    const profile = await this.db
-      .collection('profiles')
-      .findOne({ _id: res.insertedId });
+    const profile = await this.profileCollection.findOne({
+      _id: res.insertedId,
+    });
 
     return profile;
   }
@@ -54,9 +55,10 @@ export class ProfileService {
       throw new BadRequestException('Invalid proile id');
 
     // updating profile
-    const res = await this.db
-      .collection('profiles')
-      .updateOne({ _id: new ObjectId(id) }, { $set: data });
+    const res = await this.profileCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: data },
+    );
 
     // checking if profile corrospoing to profile was updated or not
     if (res.matchedCount === 0) {
@@ -64,9 +66,7 @@ export class ProfileService {
     }
 
     // returning updated profile
-    return await this.db
-      .collection('profiles')
-      .findOne({ _id: new ObjectId(id) });
+    return await this.profileCollection.findOne({ _id: new ObjectId(id) });
   }
 
   // update a part of the profile object
@@ -83,9 +83,10 @@ export class ProfileService {
     }
 
     // updating profile object
-    const res = await this.db
-      .collection('profiles')
-      .updateOne({ _id: new ObjectId(id) }, { $set: { ...data } });
+    const res = await this.profileCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { ...data } },
+    );
 
     // checking if profile corrospoing to profile was updated or not
     if (res.matchedCount === 0) {
@@ -93,9 +94,7 @@ export class ProfileService {
     }
 
     // returning updated profile
-    return await this.db
-      .collection('profiles')
-      .findOne({ _id: new ObjectId(id) });
+    return await this.profileCollection.findOne({ _id: new ObjectId(id) });
   }
 
   // delete profile
@@ -105,9 +104,9 @@ export class ProfileService {
       throw new BadRequestException('Invalid profile id');
 
     // deleting profile
-    const res = await this.db
-      .collection('profiles')
-      .deleteOne({ _id: new ObjectId(id) });
+    const res = await this.profileCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
     // checking if profile corrospoing to profile was updated or not
     if (res.deletedCount === 0) {

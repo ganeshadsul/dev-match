@@ -18,8 +18,6 @@ import { ProfileService } from './profile.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';
 import { UpdateProfileDTO } from './dto/update.profile.dto';
 import { PatchProfileDTO } from './dto/patch.profile.dto';
-import { AppError } from 'src/common/errors/app-error';
-import { ErrorTypes } from 'src/common/enums/error.types';
 import { handleProfileError } from 'src/common/errors/handlers/profile.errors.handler';
 
 @Controller('profile')

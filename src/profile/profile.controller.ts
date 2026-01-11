@@ -5,10 +5,12 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';

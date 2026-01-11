@@ -19,7 +19,10 @@ export function handleProfileError(error: unknown): never {
           error.message || 'Internal server error',
         );
     }
-  } else {
+  }
+  if (error instanceof Error) {
     throw error;
   }
+
+  throw new InternalServerErrorException('Internal Server Error');
 }

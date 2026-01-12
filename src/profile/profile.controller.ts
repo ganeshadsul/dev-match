@@ -5,12 +5,11 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   Param,
   Patch,
   Post,
   Put,
-  ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDTO } from './dto/create.profile.dto';
@@ -19,6 +18,7 @@ import { PatchProfileDTO } from './dto/patch.profile.dto';
 import { handleProfileError } from 'src/common/errors/handlers/profile.errors.handler';
 import { ObjectIdPipe } from 'src/common/pipes/object-id.pipe';
 import { ObjectId } from 'mongodb';
+import { ProfileGuard } from './profile.guard';
 
 @Controller('profile')
 export class ProfileController {
@@ -54,6 +54,7 @@ export class ProfileController {
 
   // route /profile POST
   @Post()
+  @UseGuards(ProfileGuard)
   async create(@Body() createProfileDTO: CreateProfileDTO) {
     const { name, description } = createProfileDTO;
     const res = this.profileServive.commonResponse(
